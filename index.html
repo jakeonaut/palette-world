@@ -4,18 +4,35 @@
 </head>
 <body>
 
-palette fragmentation<br/>
+<h2>palette fragmentation</h2>
+choose your fighter: 
+<select id="user_palette" onchange="userSelectPalette();">
+    <option value="monochrome">monochrome</option>
+    <option value="3bit_rgb">3bit rgb</option>
+    <option value="NES">NES</option>
+    <option value="gameboy">gameboy</option>
+    <option value="GBCpastel">GBC pastel</option>
+</select>
+<br/><br/>
+<input type="file" onchange="userUploadImage();" value="upload image" />
+<br/><br/>
 <canvas id="original"></canvas>
-<canvas id="nes"></canvas>
+<canvas id="new"></canvas>
+
+
 
 <script>
-var monochrome_palette = [
+var palettes = {};
+
+palettes["monochrome"] = [
     [0, 0, 0], [255, 255, 255]
 ];
-var minimum_palette = [
-    [0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255]
+palettes["3bit_rgb"] = [
+    /*B/W*/     [0, 0, 0], [255, 255, 255],
+    /*RGB*/     [255, 0, 0], [0, 255, 0], [0, 0, 255], 
+    /*CYM*/     [0, 255, 255], [255, 255, 0], [255, 0, 255],
 ];
-var NES_palette = [
+palettes["NES"] = [
   /*greys*/     [124, 124, 124], [188, 188, 188], [252, 252, 252], [252, 252, 252],
   /*blues1*/    [0, 0, 252], [0, 120, 248], [60, 188, 252], [164, 228, 252],
   /*blues2*/    [0, 0, 188], [0, 88, 248], [104, 136, 252], [184, 184, 248],
@@ -29,11 +46,16 @@ var NES_palette = [
   /*forest*/    [0, 104, 0], [0, 168, 0], [88, 216, 84], [184, 248, 184],
   /*seafoam*/   [0, 88, 0], [0, 168, 68], [88, 248, 152], [184, 248, 216],
   /*ice*/       [0, 64, 88], [0, 136, 136], [0, 232, 216], [0, 252, 252],
-  /*black*/     [0, 0, 0], [8, 8, 8], [124, 124, 124], [216, 216, 216]
+  /*black*/     [0, 0, 0], [8, 8, 8], [124, 124, 124], [216, 216, 216],
 ];
-
+palettes["gameboy"] = [
+    [15, 56, 15], [48, 98, 48], [139, 172, 15], [185, 208, 87]
+];
+palettes["GBCpastel"] = [
+    [4, 2, 4], [156, 146, 244], [236, 138, 140], [252, 250, 172]
+];
 /******************CHOOSE YOUR PALETTE*************************/
-var chosen_palette = monochrome_palette;
+var chosen_palette = palettes["monochrome"];
 /**************************************************************/
 
 var canvas_orig, ctx_orig, canvas, ctx;
@@ -65,8 +87,8 @@ function Pixel(r, g, b, a, x, y){
         return closest_color;
     }
 
-    this.draw = function(){
-        var color = this.closestColor(chosen_palette);
+    this.draw = function(palette){
+        var color = this.closestColor(palette);
         var r = color[0], g = color[1], b = color[2];
         var fillStyle = "rgb("+r+","+g+","+b+")";
         ctx.fillStyle = fillStyle;
@@ -79,14 +101,14 @@ function Tile(){
     this.push = function(pixel){
         this.pixels.push(pixel);
     }
-    this.draw = function(){
+    this.draw = function(palette){
         this.pixels.forEach(function(pixel){
-            pixel.draw();
+            pixel.draw(palette);
         });
     }
 }
 
-function NES(){
+function changePalette(palette){
     var tile_size = 16;
     var tiles = [];
 
@@ -117,16 +139,37 @@ function NES(){
     for (x = 0; x < tiles.length; x++){
         for (y = 0; y < tiles[x].length; y++){
             setTimeout(function(tile){
-                tile.draw();
+                tile.draw(palette);
             }.bind(this, tiles[x][y]), 0);
         }
     }
 }
 
-function init(){
+function userSelectPalette(){
+    var select = document.getElementById("user_palette");
+    var palette_name = select.options[select.selectedIndex].value;
+    chosen_palette = palettes[palette_name];
+    changePalette(chosen_palette);
+}
+function userUploadImage(){
+   var file    = document.querySelector('input[type=file]').files[0]; //sames as here
+   var reader  = new FileReader();
+
+   reader.onloadend = function () {
+       img = new Image();
+       img.src = reader.result;
+       init(img);
+   }
+
+   if (file) {
+       reader.readAsDataURL(file); //reads the data as a URL
+   } else {}
+}
+
+function init(img){
     canvas_orig = document.getElementById("original");
     ctx_orig = canvas_orig.getContext("2d");
-    canvas = document.getElementById("nes");
+    canvas = document.getElementById("new");
     ctx = canvas.getContext("2d");
 
     function loadHandler(){
@@ -139,15 +182,15 @@ function init(){
         ctx.fillStyle = "000000";
         console.log(ctx.fillStyle);
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        NES();
+        changePalette(chosen_palette);
     }
 
-    var img = new Image();
-    img.src = "parrot.png";
     img.onload = loadHandler;
     if (img.complete) loadHandler();
 }
-init();
+var img = new Image();
+img.src = "parrot.png";
+init(img);
 
 </script>
 </body>
