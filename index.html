@@ -140,7 +140,7 @@ function changePalette(palette){
         for (y = 0; y < tiles[x].length; y++){
             setTimeout(function(tile){
                 tile.draw(palette);
-            }.bind(this, tiles[x][y]), 0);
+            }.bind(this, tiles[x][y]), Math.floor(Math.random()*300));
         }
     }
 }
