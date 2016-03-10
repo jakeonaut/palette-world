@@ -1,0 +1,154 @@
+<html>
+<head>
+    <title>palette world</title>
+</head>
+<body>
+
+palette fragmentation<br/>
+<canvas id="original"></canvas>
+<canvas id="nes"></canvas>
+
+<script>
+var monochrome_palette = [
+    [0, 0, 0], [255, 255, 255]
+];
+var minimum_palette = [
+    [0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255]
+];
+var NES_palette = [
+  /*greys*/     [124, 124, 124], [188, 188, 188], [252, 252, 252], [252, 252, 252],
+  /*blues1*/    [0, 0, 252], [0, 120, 248], [60, 188, 252], [164, 228, 252],
+  /*blues2*/    [0, 0, 188], [0, 88, 248], [104, 136, 252], [184, 184, 248],
+  /*blupurp*/   [68, 40, 188], [104, 68, 252], [152, 120, 248], [216, 184, 248],
+  /*fuschia*/   [148, 0, 132], [216, 0, 204], [248, 120, 248], [248, 184, 248],
+  /*magenta*/   [168, 0, 32], [228, 0, 88], [248, 88, 152], [248, 164, 192],
+  /*blood*/     [168, 16, 0], [248, 56, 0], [248, 120, 88], [240, 208, 176],
+  /*rust*/      [136, 20, 0], [228, 92, 16], [252, 160, 68], [252, 224, 168],
+  /*goldenrod*/ [80, 48, 0], [172, 124, 0], [248, 184, 0], [248, 216, 120],
+  /*spring*/    [0, 120, 0], [0, 184, 0], [184, 248, 24], [216, 248, 120],
+  /*forest*/    [0, 104, 0], [0, 168, 0], [88, 216, 84], [184, 248, 184],
+  /*seafoam*/   [0, 88, 0], [0, 168, 68], [88, 248, 152], [184, 248, 216],
+  /*ice*/       [0, 64, 88], [0, 136, 136], [0, 232, 216], [0, 252, 252],
+  /*black*/     [0, 0, 0], [8, 8, 8], [124, 124, 124], [216, 216, 216]
+];
+
+/******************CHOOSE YOUR PALETTE*************************/
+var chosen_palette = monochrome_palette;
+/**************************************************************/
+
+var canvas_orig, ctx_orig, canvas, ctx;
+function Pixel(r, g, b, a, x, y){
+    this.r = r;
+    this.g = g;
+    this.b = b;
+    this.a = a;
+    this.x = x;
+    this.y = y;
+
+    this.closestColor = function(raw_palette){
+        var min_dist = 9999;
+        var closest_color = [0, 255, 0];
+        var r = this.r;
+        var g = this.g;
+        var b = this.b;
+        raw_palette.forEach(function(color){
+            var dist = Math.sqrt(
+                Math.pow(color[0]-r, 2) +
+                Math.pow(color[1]-g, 2) +
+                Math.pow(color[2]-b, 2)
+            );
+            if (dist < min_dist){
+                min_dist = dist;
+                closest_color = color;
+            }
+        });
+        return closest_color;
+    }
+
+    this.draw = function(){
+        var color = this.closestColor(chosen_palette);
+        var r = color[0], g = color[1], b = color[2];
+        var fillStyle = "rgb("+r+","+g+","+b+")";
+        ctx.fillStyle = fillStyle;
+        ctx.fillRect(this.x, this.y, 1, 1);
+    }
+}
+
+function Tile(){
+    this.pixels = [];
+    this.push = function(pixel){
+        this.pixels.push(pixel);
+    }
+    this.draw = function(){
+        this.pixels.forEach(function(pixel){
+            pixel.draw();
+        });
+    }
+}
+
+function NES(){
+    var tile_size = 16;
+    var tiles = [];
+
+    console.log("start copying");
+    //copy pixels into our tile array (from the original canvas)
+    var imgData = ctx_orig.getImageData(0, 0, canvas_orig.width, canvas_orig.height).data;
+    var x = 0;
+    var y = 0;
+    for (var i = 0; i < imgData.length; i+=4){
+        var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], x, y);
+        var tile_x = Math.floor(x / tile_size);
+        var tile_y = Math.floor(y / tile_size);
+        if (tile_x >= tiles.length)
+            tiles.push([]);
+        if (tile_y >= tiles[tile_x].length)
+            tiles[tile_x].push(new Tile());
+        tiles[tile_x][tile_y].push(pixel);
+
+        x += 1;
+        if (x >= canvas_orig.width){
+            x = 0;
+            y += 1;
+        }
+    }
+
+    //now, draw the tiles onto the new canvas!
+    console.log("start drawing");
+    for (x = 0; x < tiles.length; x++){
+        for (y = 0; y < tiles[x].length; y++){
+            setTimeout(function(tile){
+                tile.draw();
+            }.bind(this, tiles[x][y]), 0);
+        }
+    }
+}
+
+function init(){
+    canvas_orig = document.getElementById("original");
+    ctx_orig = canvas_orig.getContext("2d");
+    canvas = document.getElementById("nes");
+    ctx = canvas.getContext("2d");
+
+    function loadHandler(){
+        canvas_orig.width = img.width;
+        canvas_orig.height = img.height;
+        ctx_orig.drawImage(img, 0, 0);
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.fillStyle = "000000";
+        console.log(ctx.fillStyle);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        NES();
+    }
+
+    var img = new Image();
+    img.src = "parrot.png";
+    img.onload = loadHandler;
+    if (img.complete) loadHandler();
+}
+init();
+
+</script>
+</body>
+</html>
