@@ -2,6 +2,20 @@
 <head>
     <title>palette world</title>
     <link rel="icon" href="favicon.ico?v=2" />
+    <style type="text/css">
+        .color{
+            border: 1px solid black;
+            width: 16px;
+            height: 16px;
+            float: left;
+            margin-left: 3px;
+            margin-bottom: 3px;
+            cursor: pointer;
+        }
+        input::-webkit-color-swatch {
+            border: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -13,22 +27,57 @@ choose your fighter:
     <option value="NES">NES</option>
     <option value="gameboy">gameboy</option>
     <option value="GBCpastel">GBC pastel</option>
+    <option value="2">random 2 color</option>
+    <option value="4">random 4 color</option>
+    <option value="16">random 16 color</option>
 </select>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Upload ur own image: <input type="file" onchange="userUploadImage();" value="upload image" />
+<span style="font-size: 36px;font-weight:bold;">image:</span> <input type="file" onchange="userUploadImage();" value="upload image" />
 <br/><br/>
+<span style="float:left;">palette: </span><span id="palette_area"></span>
+<div style="clear:both;"></div>
+<!--<br/>
+color mode: <select id="color_style" onchange="userSelectColorStyle();">
+    <option value="closestColor">closest color</option>
+    <option value="hicolor">high color</option>
+</select>
+<br/>--><br/>
 <input type="checkbox" id="user_dithering" checked onchange="userToggleDithering();">
     use dithering?
-<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="checkbox" id="user_tiled_palettes" onchange="userToggleTiledPalettes();">
     break palette by tiles?
-<br/><br/>
+<br/>
+<br/>
 <canvas id="original"></canvas>
 <canvas id="new"></canvas>
 
 
 <script src="palettes.js"></script>
+<script src="PixelTile.js"></script>
+<script src="user.js"></script>
 <script src="script.js"></script>
+<script type="text/javascript">
+var canvas_orig, ctx_orig, canvas, ctx;
+
+function init(img){
+    canvas_orig = document.getElementById("original");
+    ctx_orig = canvas_orig.getContext("2d");
+    canvas = document.getElementById("new");
+    ctx = canvas.getContext("2d");
+
+    function loadHandler(){
+        Drawr.init(img);
+        Drawr.drawWithPalette(user_palette);
+    }
+
+    img.onload = loadHandler;
+    if (img.complete) loadHandler();
+}
+var img = new Image();
+img.src = "parrot.png";
+init(img);
+</script>
 
 <div style="position:absolute; left: 3px; bottom: 3px;">
     <a href="http://cakeandturtles.nfshost.com/">&lt;&lt; back to cakeandturtles</a>

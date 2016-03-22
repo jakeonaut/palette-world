@@ -6,5 +6,4 @@ todo:
         -then recolor every color chunk to one distinct color from the palette
           -choose the chunk that is closest to any color first, remove that color from palette, repeat
 
-    3. generate random color palette of up to 2-16 colors???
     4. allow custom palette selection (using color selector)
