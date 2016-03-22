@@ -1,7 +1,10 @@
 todo:
-    1. -clump colors in a tile into as many distinct "colors" as there are colors in the palette
-        -then, get the average color value of each of these "color clumps"
-        -now, select a distinct color from the 'palette' for each individual color clump for conversion
-    2. -don't need to re-get original pixels/tiles from the first image every time you repalette??
-    
-    
+    1. -don't need to re-get original pixels/tiles from the first image every time you repalette??
+    2. two color selection modes:
+      a. pick closest color
+      b. clump all pixels into distinct chunks of number = number of colors in palette
+        -then recolor every color chunk to one distinct color from the palette
+          -choose the chunk that is closest to any color first, remove that color from palette, repeat
+
+    3. generate random color palette of up to 2-16 colors???
+    4. allow custom palette selection (using color selector)
