@@ -1,5 +1,7 @@
 /******************CHOOSE YOUR PALETTE*************************/
-var chosen_palette = palettes["monochrome"];
+var user_palette = palettes["monochrome"];
+var user_dithering = true;
+var user_tiled_palettes = false;
 /**************************************************************/
 
 var canvas_orig, ctx_orig, canvas, ctx;
@@ -14,12 +16,12 @@ function Pixel(r, g, b, a, x, y){
     this.x = x;
     this.y = y;
 
-    this.closestColor = function(raw_palette){
+    this.closestColor = function(raw_palette, r, g, b){
         var min_dist = 9999;
         var closest_color = [0, 255, 0];
-        var r = this.r;
-        var g = this.g;
-        var b = this.b;
+        if (r === undefined) r = this.r;
+        if (g === undefined) g = this.g;
+        if (b === undefined) b = this.b;
         raw_palette.forEach(function(color){
             var dist = Math.sqrt(
                 Math.pow(color[0]-r, 2) +
@@ -41,6 +43,23 @@ function Pixel(r, g, b, a, x, y){
         ctx.fillStyle = fillStyle;
         ctx.fillRect(this.x, this.y, 1, 1);
     }
+    this.draw_dithered = function(palette){
+        var m = new Array(
+            [1, 9, 3, 11],
+            [13, 5, 15, 7],
+            [4, 12, 2, 10],
+            [16, 8, 14, 6]
+        );
+        var ratio = 3*(m[this.x%m.length][this.y%m[0].length]);
+        var r = this.r + ratio;
+        var g = this.g + ratio;
+        var b = this.b + ratio;
+        var color = this.closestColor(palette, r, g, b);
+        r = color[0]; g = color[1]; b = color[2];
+        var fillStyle = "rgb("+r+","+g+","+b+")";
+        ctx.fillStyle = fillStyle;
+        ctx.fillRect(this.x, this.y, 1, 1);
+    }
 }
 
 function Tile(){
@@ -49,17 +68,20 @@ function Tile(){
         this.pixels.push(pixel);
     }
     this.draw = function(palette){
-        var sub_palette = this.selectSubPalette(palette);
+        if (user_tiled_palettes)
+            palette = this.selectSubPalette(palette);
         this.pixels.forEach(function(pixel){
-            pixel.draw(sub_palette);
+            if (user_dithering)
+                pixel.draw_dithered(palette);
+            else pixel.draw(palette);
         });
     }
-    
+
     this.selectSubPalette = function(palette){
         //this is time intensive???
         var refined_palette = [palette[0]];
         var colors = {};
-        
+
         this.pixels.forEach(function(pixel){
             var color = pixel.closestColor(palette);
             if (sameColor(color, refined_palette[0])) return;
@@ -69,7 +91,7 @@ function Tile(){
                 colors[color][1]++;
             }
         });
-        
+
         //do 3 times
         for (var i =0; i < 3; i++){
             //loop through the colors to pick the most popular one to
@@ -131,24 +153,19 @@ function drawWithPalette(palette){
 }
 
 
-function drawWithMetaPalette(palette){
-    
-}
-
-//a very intensive process indeed...
-function createMetaPalette(palette){
-    //have every tile select its own optimal subpalette
-        //that is composed of only 4 colors
-        //assuming that the "shared" color amongst all palettes is black
-    var sub_palettes = {};
-}
-
-
 function userSelectPalette(){
     var select = document.getElementById("user_palette");
     var palette_name = select.options[select.selectedIndex].value;
-    chosen_palette = palettes[palette_name];
-    drawWithPalette(chosen_palette);
+    user_palette = palettes[palette_name];
+    drawWithPalette(user_palette);
+}
+function userToggleDithering(){
+    user_dithering = !user_dithering;
+    drawWithPalette(user_palette);
+}
+function userToggleTiledPalettes(){
+    user_tiled_palettes = !user_tiled_palettes;
+    drawWithPalette(user_palette);
 }
 function userUploadImage(){
    var file    = document.querySelector('input[type=file]').files[0]; //sames as here
@@ -181,8 +198,8 @@ function init(img){
         ctx.fillStyle = "000000";
         console.log(ctx.fillStyle);
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawWithPalette(chosen_palette);
-        //var meta_palette = createMetaPalette(chosen_palette);
+        drawWithPalette(user_palette);
+        //var meta_palette = createMetaPalette(user_palette);
         //drawWithMetaPalette(meta_palette);
     }
 

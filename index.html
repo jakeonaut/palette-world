@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>palette world</title>
+    <link rel="icon" href="favicon.ico?v=2" />
 </head>
 <body>
 
@@ -13,8 +14,14 @@ choose your fighter:
     <option value="gameboy">gameboy</option>
     <option value="GBCpastel">GBC pastel</option>
 </select>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Upload ur own image: <input type="file" onchange="userUploadImage();" value="upload image" />
 <br/><br/>
-<input type="file" onchange="userUploadImage();" value="upload image" />
+<input type="checkbox" id="user_dithering" checked onchange="userToggleDithering();">
+    use dithering?
+<br/>
+<input type="checkbox" id="user_tiled_palettes" onchange="userToggleTiledPalettes();">
+    break palette by tiles?
 <br/><br/>
 <canvas id="original"></canvas>
 <canvas id="new"></canvas>
