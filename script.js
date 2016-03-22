@@ -93,12 +93,28 @@ Drawr.drawWithPalette = function(palette){
         }
     }
     else if (user_color_mode === ColorMode.HICOLOR){
-        //TODO:: this is actually way more intensive/complicated than i thought
+        //median cut algorithm
         var colors = {};
+        var min_r = 999, max_r = 0;
+        var min_g = 999, max_g = 0;
+        var min_b = 999, max_b = 0;
+        var buckets = [];
+
         for (var x = 0; x < Drawr.tiles.length; x++){
             for (var y = 0; y < Drawr.tiles[x].length; y++){
                 var tile = Drawr.tiles[x][y];
-                tile.populate_colors(colors);
+                for (var i = 0; i < tile.pixels.length; i++){
+                    var p = tile.pixels[i];
+                    if (p.r > max_r) max_r = p.r;
+                    if (p.r < min_r) min_r = p.r;
+                    if (p.g > max_g) max_g = p.g;
+                    if (p.g < min_g) min_g = p.g;
+                    if (p.b > max_b) max_b = p.b;
+                    if (p.b < min_b) min_b = p.b;
+                    var color = [p.r, p.g, p.b];
+                    //FUCK I DONT KNOW HOW TO DO BUCKETS AND THIS IS A LOT OF SORTING
+                    bucket.push(color);
+                }
             }
         }
         //TODO::
