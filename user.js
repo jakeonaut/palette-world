@@ -58,8 +58,10 @@ function userUploadImage(){
    reader.onloadend = function () {
        img = new Image();
        img.src = reader.result;
-       Drawr.init(img);
-       Drawr.drawWithPalette(user_palette);
+       img.onload = function(){
+           Drawr.init(img);
+           Drawr.drawWithPalette(user_palette);
+       }
    }
 
    if (file) {

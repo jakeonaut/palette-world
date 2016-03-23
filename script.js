@@ -4,6 +4,8 @@ Drawr.tiles = [];
 Drawr.init = function(img){
     canvas_orig.width = img.width;
     canvas_orig.height = img.height;
+    alert(img.width);
+    alert(img.height);
     ctx_orig.drawImage(img, 0, 0);
 
     canvas.width = img.width;
@@ -16,7 +18,9 @@ Drawr.init = function(img){
 
     console.log("start copying");
     //copy pixels into our tile array (from the original canvas)
-    var imgData = ctx_orig.getImageData(0, 0, canvas_orig.width, canvas_orig.height).data;
+    var w = canvas_orig.width;
+    var h = canvas_orig.height;
+    var imgData = ctx_orig.getImageData(0, 0, w, h).data;
     var x = 0;
     var y = 0;
     for (var i = 0; i < imgData.length; i+=4){
