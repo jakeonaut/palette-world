@@ -4,6 +4,7 @@ ColorMode.HICOLOR = 1;
 
 /******************CHOOSE YOUR PALETTE*************************/
 var user_palette = palettes["monochrome"].slice(0);
+    var hicolor_mapping = [];
 var user_color_mode = ColorMode.CLOSEST_COLOR;
 var user_dithering = true;
 var user_tiled_palettes = false;
@@ -36,6 +37,10 @@ function userSelectColorStyle(){
         user_color_mode = ColorMode.CLOSEST_COLOR;
     if (color_mode === "hicolor")
         user_color_mode = ColorMode.HICOLOR;
+
+    Drawr.init(img);
+    if (user_color_mode === ColorMode.CLOSEST_COLOR)
+        Drawr.drawWithPalette(user_palette);
 }
 
 function userToggleDithering(){
