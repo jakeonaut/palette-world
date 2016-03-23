@@ -107,24 +107,20 @@ Drawr.drawWithPalette = function(palette){
     }
 }
 
+Drawr.quantizeColor = function(){
+    return Drawr.hicolorInit([0, 1, 2, 3, 4, 5, 6, 7]);
+}
+
 Drawr.hicolorInit = function(palette){
     //median cut algorithm
-    var min_r = 999, max_r = 0;
-    var min_g = 999, max_g = 0;
-    var min_b = 999, max_b = 0;
     var buckets = [[]];
 
+    //populate the first bucket
     for (var x = 0; x < Drawr.tiles.length; x++){
         for (var y = 0; y < Drawr.tiles[x].length; y++){
             var tile = Drawr.tiles[x][y];
             for (var i = 0; i < tile.pixels.length; i++){
                 var p = tile.pixels[i];
-                if (p.r > max_r) max_r = p.r;
-                if (p.r < min_r) min_r = p.r;
-                if (p.g > max_g) max_g = p.g;
-                if (p.g < min_g) min_g = p.g;
-                if (p.b > max_b) max_b = p.b;
-                if (p.b < min_b) min_b = p.b;
                 var color = [p.r, p.g, p.b];
 
                 buckets[0].push(color);
@@ -136,6 +132,18 @@ Drawr.hicolorInit = function(palette){
     while (buckets.length < palette.length){
         var new_buckets = [];
         for (var i = 0; i < buckets.length; i++){
+            var min_r = 999, max_r = 0;
+            var min_g = 999, max_g = 0;
+            var min_b = 999, max_b = 0;
+            buckets[i].forEach(function(color){
+                if (color[0] > max_r) max_r = color[0];
+                if (color[0] < min_r) min_r = color[0];
+                if (color[1] > max_g) max_g = color[1];
+                if (color[1] < min_g) min_g = color[1];
+                if (color[2] > max_b) max_b = color[2];
+                if (color[2] < min_b) min_b = color[2];
+            });
+
             //SORT THE BUCKET
             var sort_index = 0;
             if (max_g - min_g > max_r - min_r){
@@ -185,40 +193,42 @@ Drawr.hicolorInit = function(palette){
         }
     }
 
+    return quantized_color_palette;
+
     //map every quantized color to a color from the user palette
-    var final_palette = [];
-    for (var i = 0; i < palette.length; i++){
-        final_palette.push([palette[i], true]);
-        quantized_color_palette[i] = [quantized_color_palette[i], true];
-    }
-
-    hicolor_mapping = {};
-    while (true){
-        var quantized_color = null;
-        var final_color = null;
-        var color_distance = 999;
-        for (var i = 0; i < quantized_color_palette.length; i++){
-            if (!quantized_color_palette[i][1]) continue;
-            for (var j = 0; j < final_palette.length; j++){
-                if (!final_palette[j][1]) continue;
-
-                var c1 = quantized_color_palette[i][0];
-                var c2 = final_palette[j][0];
-                var dist = Math.sqrt(
-                    Math.pow(c1[0]-c2[0], 2) +
-                    Math.pow(c1[1]-c2[1], 2) +
-                    Math.pow(c1[2]-c2[2], 2)
-                );
-                if (dist < color_distance){
-                    quantized_color = i;
-                    final_color = j;
-                    color_distance = dist;
-                }
-            }
-        }
-        if (quantized_color === null) break;
-        hicolor_mapping[quantized_color] = final_color;
-        final_palette[final_color] = false;
-        quantized_color_palette[quantized_color] = false;
-    }
+    // var final_palette = [];
+    // for (var i = 0; i < palette.length; i++){
+    //     final_palette.push([palette[i], true]);
+    //     quantized_color_palette[i] = [quantized_color_palette[i], true];
+    // }
+    //
+    // hicolor_mapping = {};
+    // while (true){
+    //     var quantized_color = null;
+    //     var final_color = null;
+    //     var color_distance = 999;
+    //     for (var i = 0; i < quantized_color_palette.length; i++){
+    //         if (!quantized_color_palette[i][1]) continue;
+    //         for (var j = 0; j < final_palette.length; j++){
+    //             if (!final_palette[j][1]) continue;
+    //
+    //             var c1 = quantized_color_palette[i][0];
+    //             var c2 = final_palette[j][0];
+    //             var dist = Math.sqrt(
+    //                 Math.pow(c1[0]-c2[0], 2) +
+    //                 Math.pow(c1[1]-c2[1], 2) +
+    //                 Math.pow(c1[2]-c2[2], 2)
+    //             );
+    //             if (dist < color_distance){
+    //                 quantized_color = i;
+    //                 final_color = j;
+    //                 color_distance = dist;
+    //             }
+    //         }
+    //     }
+    //     if (quantized_color === null) break;
+    //     hicolor_mapping[quantized_color] = final_color;
+    //     final_palette[final_color] = false;
+    //     quantized_color_palette[quantized_color] = false;
+    // }
 }

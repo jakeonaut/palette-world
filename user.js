@@ -15,12 +15,16 @@ function userSelectPalette(){
     var palette_name = select.options[select.selectedIndex].value;
     if (!isNaN(palette_name)){
         var n = Number(palette_name);
-        user_palette = [];
-        for (var i = 0; i < n; i++){
-            var r = Math.floor(Math.random()*256);
-            var g = Math.floor(Math.random()*256);
-            var b = Math.floor(Math.random()*256);
-            user_palette.push([r, g, b]);
+        if (n > 0){
+            user_palette = [];
+            for (var i = 0; i < n; i++){
+                var r = Math.floor(Math.random()*256);
+                var g = Math.floor(Math.random()*256);
+                var b = Math.floor(Math.random()*256);
+                user_palette.push([r, g, b]);
+            }
+        }else{
+            user_palette = Drawr.quantizeColor(img);
         }
     }
     else{
