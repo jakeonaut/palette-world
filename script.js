@@ -4,8 +4,6 @@ Drawr.tiles = [];
 Drawr.init = function(img){
     canvas_orig.width = img.width;
     canvas_orig.height = img.height;
-    alert(img.width);
-    alert(img.height);
     ctx_orig.drawImage(img, 0, 0);
 
     canvas.width = img.width;
