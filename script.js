@@ -12,6 +12,10 @@ Drawr.init = function(img){
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     var tile_size = 16;
+    if (canvas.width * canvas.height > 256*256)
+        tile_size = 32;
+    if (canvas.width * canvas.height > 1024*512)
+        tile_size = 64;
     Drawr.tiles = [];
 
     console.log("start copying");
