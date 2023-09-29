@@ -20,6 +20,9 @@
 <body>
 
 <h2>palette fragmentation</h2>
+<br>
+<div style="display:inline-block;position:absolute;left:512px;top:58px;"><span style="font-size: 36px;font-weight:bold;">image:</span> <input id="userImage" type="file" onchange="userUploadImage();" value="upload image" /></div>
+<br>
 choose your fighter:
 <select id="user_palette" onchange="userSelectPalette();">
     <option value="monochrome">monochrome</option>
@@ -33,8 +36,8 @@ choose your fighter:
     <option value="16">random 16 color</option>
     <!--<option value="0">8 colors chosen from image</option>-->
 </select>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<span style="font-size: 36px;font-weight:bold;">image:</span> <input type="file" onchange="userUploadImage();" value="upload image" />
+<br>
+<div style="display:inline-block;"><i>upload palette:</i> <input id="userPalette" type="file" onchange="userUploadPalette();" value="upload image" /></div>
 <br/><br/>
 <span style="float:left;">palette: </span><span id="palette_area"></span>
 <div style="clear:both;"></div>
@@ -44,15 +47,30 @@ color mode: <select id="color_style" onchange="userSelectColorStyle();">
     <option value="hicolor">high color</option>
 </select>
 <br/>--><br/>
-<input type="checkbox" id="user_dithering" checked onchange="userToggleDithering();">
+<span style="cursor:pointer;border:1px solid black; padding:4px;" onClick="userToggleHideSourceImg()">
+    <input style="cursor:pointer;" type="checkbox" id="user_hide_src_img">
+    hide source img?
+</span>
+&nbsp;&nbsp;&nbsp;&nbsp;
+zoom: <select id="user_zoom" onchange="userSelectZoom();">
+    <option value="1">x1</option>
+    <option value="2">x2</option>
+    <option value="3">x3</option>
+</select>
+<br><br>
+<span style="cursor:pointer;border:1px solid black; padding:4px;" onClick="userToggleDithering()">    
+    <input style="cursor:pointer;" type="checkbox" id="user_dithering" checked>
     use dithering?
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="checkbox" id="user_tiled_palettes" onchange="userToggleTiledPalettes();">
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<div style="cursor:pointer;border:1px solid black; padding:4px;display:inline-block;" onClick="userToggleTiledPalettes()">
+    <input style="cursor:pointer;" type="checkbox" id="user_tiled_palettes">
     break palette by tiles?
-<br/>
-<br/>
-<canvas id="original"></canvas>
+</div>
+<br>
+<br>
 <canvas id="new"></canvas>
+<canvas id="original"></canvas>
+<canvas id="palette" style="display:none;"></canvas>
 
 
 <script src="palettes.js"></script>
@@ -69,7 +87,7 @@ function init(img){
     ctx = canvas.getContext("2d");
 
     function loadHandler(){
-        Drawr.init(img);
+        Drawr.init(img, 1);
         Drawr.drawWithPalette(user_palette);
     }
 

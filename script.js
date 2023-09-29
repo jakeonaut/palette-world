@@ -1,20 +1,21 @@
 var Drawr = function(){};
 Drawr.tiles = [];
 
-Drawr.init = function(img){
-    canvas_orig.width = img.width;
-    canvas_orig.height = img.height;
+Drawr.init = function(img, zoom_level){
+    canvas_orig.width = img.width * zoom_level;
+    canvas_orig.height = img.height * zoom_level;
     ctx_orig.drawImage(img, 0, 0);
 
-    canvas.width = img.width;
-    canvas.height = img.height;
+    canvas.width = img.width * zoom_level;
+    canvas.height = img.height * zoom_level;
     ctx.fillStyle = "000000";
+    ctx.scale(zoom_level, zoom_level);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     var tile_size = 16;
-    if (canvas.width * canvas.height > 256*256)
+    if (canvas.width * canvas.height > 256*256 * zoom_level*zoom_level)
         tile_size = 32;
-    if (canvas.width * canvas.height > 1024*512)
+    if (canvas.width * canvas.height > 1024*512 * zoom_level*zoom_level)
         tile_size = 64;
     Drawr.tiles = [];
 
