@@ -1,22 +1,63 @@
 var Drawr = function(){};
 Drawr.tiles = [];
 
-Drawr.init = function(img, zoom_level){
-    canvas_orig.width = img.width * zoom_level;
-    canvas_orig.height = img.height * zoom_level;
-    ctx_orig.drawImage(img, 0, 0);
+Drawr.init = function(img){
+    const max_pixels = 800*600;
+    if (img.width * img.height > max_pixels) {
+        // Too big!!! we're gonna crash!!!! let's resize
+        const ratio = img.width / img.height;
+        // console.log("TOO BIG! ratio: ", ratio);
+        // Width is greater than or equal to height, so let's resize width first.
+        if (ratio >= 1.0) {
+            // let x = smallEnoughWidth
+            // x / ratio = height
+            // x * (x / ratio) = max_pixels
+            // x^2 / ratio = max_pixels
+            // sqrt(max_pixels * ratio) = x
+            const width = Math.sqrt(max_pixels * ratio);
+            img.width = width;
+            img.height = width / ratio;
+        }
+        // Height is greater than width, so let's resize height first.
+        else {
+            // let x = smallEnoughHeight
+            // ratio * x = width
+            // x^2 * ratio = max_pixels
+            // sqrt(max_pixels / ratio) = x
+            const height = Math.sqrt(max_pixels / ratio);
+            img.height = height;
+            img.width = height * ratio;
+        }
+        console.log("new w * h: ", img.width, " * ", img.height);
+    }
 
-    canvas.width = img.width * zoom_level;
-    canvas.height = img.height * zoom_level;
+    canvas_orig.width = img.width;
+    canvas_orig.height = img.height;
+    ctx_orig.drawImage(img, 0, 0, img.width, img.height);
+
+    canvas.width = img.width;
+    canvas.height = img.height;
     ctx.fillStyle = "000000";
-    ctx.scale(zoom_level, zoom_level);
+    // ctx.scale(zoom_level, zoom_level);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     var tile_size = 16;
-    if (canvas.width * canvas.height > 256*256 * zoom_level*zoom_level)
+    if (canvas.width * canvas.height > 256*256) {
         tile_size = 32;
-    if (canvas.width * canvas.height > 1024*512 * zoom_level*zoom_level)
+    }
+    if (canvas.width * canvas.height > 1024*512) {
         tile_size = 64;
+    }
+
+    if (canvas.width * canvas.height < 256*256) {
+        // console.log("SCALE UP!");
+        canvas.style.transform = "scale(2.0)";
+        canvas.style.translate = "50% 50%";
+    } else {
+        // console.log("SCALE DOWN!");
+        canvas.style.transform = "unset";
+        canvas.style.translate = "unset";
+    }
     Drawr.tiles = [];
 
     console.log("start copying");
