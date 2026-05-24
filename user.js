@@ -2,13 +2,22 @@ var ColorMode = function(){}
 ColorMode.CLOSEST_COLOR = 0;
 ColorMode.HICOLOR = 1;
 
+const ColorSpace = ()=>{};
+ColorSpace.EUCLIDEAN = 0;
+ColorSpace.CIELAB = 1;
+ColorSpace.YIQ = 2;
+ColorSpace.HSV = 3;
+ColorSpace.XYZ = 4;
+ColorSpace.REDMEAN = 5;
+
 /******************CHOOSE YOUR PALETTE*************************/
-var user_palette = palettes["monochrome"].slice(0);
+var user_color_space = ColorSpace.EUCLIDEAN; 
+var user_palette = palettes["NES"].slice(0);
     var hicolor_mapping = [];
 var user_color_mode = ColorMode.CLOSEST_COLOR;
-var hide_src_img = false
+var user_hide_src_img = true
 var user_dithering = true;
-var user_tiled_palettes = false;
+var user_tiled_palettes = true;
 var user_zoom_level = 1
 /**************************************************************/
 
@@ -72,7 +81,7 @@ function userSelectZoom() {
     var select = document.getElementById("user_zoom");
     user_zoom_level = Number(select.options[select.selectedIndex].value);
 
-    Drawr.init(img, user_zoom_level);
+    Drawr.init(img);
     Drawr.drawWithPalette(user_palette);
 }
 
@@ -85,16 +94,38 @@ function userSelectColorStyle(){
     if (color_mode === "hicolor")
         user_color_mode = ColorMode.HICOLOR;
 
-    Drawr.init(img, user_zoom_level);
+    Drawr.init(img);
     if (user_color_mode === ColorMode.CLOSEST_COLOR)
         Drawr.drawWithPalette(user_palette);
 }
 
-document.getElementById("user_hide_src_img").checked = hide_src_img;
+const userSelectColorSpace = () => {
+    var select = document.getElementById("color_space");
+    var color_space = select.options[select.selectedIndex].value;
+
+    if (color_space === "rgb") {
+        user_color_space = ColorSpace.EUCLIDEAN;
+    } else if (color_space === "rgbredmean") {
+        user_color_space = ColorSpace.REDMEAN;
+    } else if (color_space === "cielab") {
+        user_color_space = ColorSpace.CIELAB;
+    } else if (color_space === "xyz") {
+        user_color_space = ColorSpace.XYZ;
+    } else if (color_space === "hsv") {
+        user_color_space = ColorSpace.HSV;
+    } else if (color_space === "yiq") {
+        user_color_space = ColorSpace.YIQ;
+    }
+
+    Drawr.init(img);
+    Drawr.drawWithPalette(user_palette);
+}
+
+document.getElementById("user_hide_src_img").checked = user_hide_src_img;
 function userToggleHideSourceImg() {
-    hide_src_img = !hide_src_img;
-    document.getElementById("original").style.display = hide_src_img ? "none" : "";
-    document.getElementById("user_hide_src_img").checked = hide_src_img;
+    user_hide_src_img = !user_hide_src_img;
+    document.getElementById("original").style.display = user_hide_src_img ? "none" : "";
+    document.getElementById("user_hide_src_img").checked = user_hide_src_img;
 }
 document.getElementById("user_dithering").checked = user_dithering;
 function userToggleDithering(){
@@ -109,14 +140,14 @@ function userToggleTiledPalettes(){
     document.getElementById("user_tiled_palettes").checked = user_tiled_palettes;
 }
 function userUploadImage(){
-   var file    = document.querySelector('input[type=file]#userImage').files[0]; //sames as here
-   var reader  = new FileReader();
+   const file = document.querySelector('input[type=file]#userImage').files[0]; //sames as here
+   const reader = new FileReader();
 
    reader.onloadend = function () {
        img = new Image();
        img.src = reader.result;
        img.onload = function(){
-           Drawr.init(img, user_zoom_level);
+           Drawr.init(img);
            Drawr.drawWithPalette(user_palette);
        }
    }

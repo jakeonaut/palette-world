@@ -3,6 +3,14 @@
     <title>palette world</title>
     <link rel="icon" href="favicon.ico?v=2" />
     <style type="text/css">
+        body {
+            background-color: antiquewhite;
+            /* background-image: url('bg.jpg');
+            background-attachment: fixed; */
+        }
+        /* #original {
+            opacity: 0.9;
+        } */
         .color{
             border: 1px solid black;
             width: 16px;
@@ -15,19 +23,49 @@
         input::-webkit-color-swatch {
             border: none;
         }
+        input[type="file"] {
+            max-width: 200px;
+        }
+        canvas {
+            border: 2px double black;
+            image-rendering: pixelated;
+            /* padding: 4px; */
+        }
+        .main-container {
+            /* display: flex; */
+        }
+        .ui-container {
+            border: 1px solid black;
+            padding: 8px;
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            background-color: white;
+            width: 356px;
+            max-width: 356px;
+            z-index: 9;
+            /* opacity: 0.1; */
+        }
+        /* .ui-container:hover {
+            opacity: 0.9;
+        } */
+        .canvas-container {
+
+        }
     </style>
 </head>
 <body>
 
-<h2>palette fragmentation</h2>
-<br>
-<div style="display:inline-block;position:absolute;left:512px;top:58px;"><span style="font-size: 36px;font-weight:bold;">image:</span> <input id="userImage" type="file" onchange="userUploadImage();" value="upload image" /></div>
-<br>
-choose your fighter:
+<div class="main-container" >
+<div class="ui-container">
+<div style="display:inline-block;"><span style="font-size: 36px;font-weight:bold;">image:</span> <input id="userImage" type="file" onchange="userUploadImage();" value="upload image" /></div>
+
+<br><br>
+pick a palette:
 <select id="user_palette" onchange="userSelectPalette();">
-    <option value="monochrome">monochrome</option>
-    <option value="3bit_rgb">3bit rgb</option>
     <option value="NES">NES</option>
+    <option value="3bit_rgb">3bit rgb</option>
+    <option value="monochrome">monochrome</option>
     <option value="gameboy">gameboy</option>
     <option value="GBCpastel">GBC pastel</option>
     <option value="2">random 2 color</option>
@@ -37,9 +75,9 @@ choose your fighter:
     <!--<option value="0">8 colors chosen from image</option>-->
 </select>
 <br>
-<div style="display:inline-block;"><i>upload palette:</i> <input id="userPalette" type="file" onchange="userUploadPalette();" value="upload image" /></div>
+<div style="display:inline-block;margin-left:16px; margin-top:8px;"><i>upload palette:</i> <input id="userPalette" type="file" onchange="userUploadPalette();" value="upload image" /></div>
 <br/><br/>
-<span style="float:left;">palette: </span><span id="palette_area"></span>
+<span style="float:left;"></span><span id="palette_area"></span>
 <div style="clear:both;"></div>
 <!--<br/>
 color mode: <select id="color_style" onchange="userSelectColorStyle();">
@@ -47,16 +85,25 @@ color mode: <select id="color_style" onchange="userSelectColorStyle();">
     <option value="hicolor">high color</option>
 </select>
 <br/>--><br/>
+color space: <select id="color_space" onchange="userSelectColorSpace();">
+    <option value="rgb">RGB</option>
+    <option value="rgbredmean">RGB (Redmean)</option>
+    <option value="hsv">HSV</option>
+    <option value="yiq">YIQ</option>
+    <option value="xyz">XYZ</option>
+    <option value="cielab">CIE L*a*b*</option>
+</select>
+<br/><br/>
 <span style="cursor:pointer;border:1px solid black; padding:4px;" onClick="userToggleHideSourceImg()">
     <input style="cursor:pointer;" type="checkbox" id="user_hide_src_img">
     hide source img?
 </span>
 &nbsp;&nbsp;&nbsp;&nbsp;
-zoom: <select id="user_zoom" onchange="userSelectZoom();">
+<!-- zoom: <select id="user_zoom" onchange="userSelectZoom();">
     <option value="1">x1</option>
     <option value="2">x2</option>
     <option value="3">x3</option>
-</select>
+</select> -->
 <br><br>
 <span style="cursor:pointer;border:1px solid black; padding:4px;" onClick="userToggleDithering()">    
     <input style="cursor:pointer;" type="checkbox" id="user_dithering" checked>
@@ -66,17 +113,19 @@ zoom: <select id="user_zoom" onchange="userSelectZoom();">
     <input style="cursor:pointer;" type="checkbox" id="user_tiled_palettes">
     break palette by tiles?
 </div>
-<br>
-<br>
+</div>
+<div class="canvas-container">
 <canvas id="new"></canvas>
-<canvas id="original"></canvas>
+<canvas id="original" style="display: none;"></canvas>
 <canvas id="palette" style="display:none;"></canvas>
+</div>
+</div>
 
 
 <script src="palettes.js"></script>
 <script src="PixelTile.js"></script>
 <script src="user.js"></script>
-<script src="script.js"></script>
+<script src="Drawr.js"></script>
 <script type="text/javascript">
 var canvas_orig, ctx_orig, canvas, ctx;
 
@@ -87,7 +136,7 @@ function init(img){
     ctx = canvas.getContext("2d");
 
     function loadHandler(){
-        Drawr.init(img, 1);
+        Drawr.init(img);
         Drawr.drawWithPalette(user_palette);
     }
 
@@ -99,8 +148,8 @@ img.src = "parrot.png";
 init(img);
 </script>
 
-<div style="position:absolute; left: 3px; bottom: 3px;">
+<!-- <div style="position:absolute; left: 3px; bottom: 3px;">
     <a href="https://petsclub2.com/">&lt;&lt; back to petsclub2</a>
-</div>
+</div> -->
 </body>
 </html>
